@@ -1,6 +1,7 @@
 {
   "name": "j7-dev/tgm-plugin-activation-forked",
   "description": "This is a library forked from tgmpa/tgm-plugin-activation and add some custom config and features",
+  "version": "1.0.0",
   "type": "library",
   "homepage": "http://tgmpluginactivation.com",
   "keywords": [
@@ -25,8 +26,8 @@
     }
   ],
   "support": {
-    "issues": "https://github.com/TGMPA/TGM-Plugin-Activation/issues",
-    "source": "https://github.com/TGMPA/TGM-Plugin-Activation"
+    "issues": "https://github.com/j7-dev/tgm-plugin-activation-forked/issues",
+    "source": "https://github.com/j7-dev/tgm-plugin-activation-forked"
   },
   "require": {
     "php": ">=5.2"

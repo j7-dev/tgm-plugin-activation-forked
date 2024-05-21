@@ -32,7 +32,7 @@
 	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
+if ( ! class_exists( 'J7_Required_Plugins' ) ) {
 
 	/**
 	 * Automatic plugin installation and activation library.
@@ -47,15 +47,7 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 	 * @author  Thomas Griffin
 	 * @author  Gary Jones
 	 */
-	class TGM_Plugin_Activation {
-		/**
-		 * TGMPA version number.
-		 *
-		 * @since 2.5.0
-		 *
-		 * @const string Version number.
-		 */
-		const TGMPA_VERSION = '2.6.1';
+	class J7_Required_Plugins {
 
 		/**
 		 * Regular expression to test if a URL is a WP plugin repo URL.
@@ -80,9 +72,9 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @var TGM_Plugin_Activation
+		 * @var J7_Required_Plugins
 		 */
-		public static $instance;
+		public static $instance = array();
 
 		/**
 		 * Holds arrays of plugin details.
@@ -128,7 +120,7 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 		 *
 		 * @var string
 		 */
-		public $id = 'tgmpa';
+		public $id = 'j7rp';
 
 		/**
 		 * Name of the query-string argument for the admin page.
@@ -250,7 +242,7 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @see TGM_Plugin_Activation::init()
+		 * @see J7_Required_Plugins::init()
 		 */
 		public function __construct() {
 			// Set the current WordPress version.
@@ -269,7 +261,7 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 			add_filter( 'load_textdomain_mofile', array( $this, 'overload_textdomain_mofile' ), 10, 2 );
 
 			// When the rest of WP has loaded, kick-start the rest of the class.
-			add_action( 'init', array( $this, 'init' ) );
+			add_action( 'plugins_loaded', array( $this, 'init' ), -10 );
 		}
 
 		/**
@@ -311,11 +303,23 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 		 *
 		 * @since 2.0.0
 		 *
-		 * @see TGM_Plugin_Activation::admin_menu()
-		 * @see TGM_Plugin_Activation::notices()
-		 * @see TGM_Plugin_Activation::styles()
+		 * @see J7_Required_Plugins::admin_menu()
+		 * @see J7_Required_Plugins::notices()
+		 * @see J7_Required_Plugins::styles()
 		 */
 		public function init() {
+			/**
+ * The WP_Upgrader file isn't always available. If it isn't available,
+ * we load it here.
+ *
+ * We check to make sure no action or activation keys are set so that WordPress
+ * does not try to re-include the class when processing upgrades or installs outside
+ * of the class.
+ *
+ * @since 2.2.0
+ */
+			add_action( 'admin_init', array( $this, 'tgmpa_load_bulk_installer' ) );
+
 			/**
 			 * By default TGMPA only loads on the WP back-end and not in an Ajax call. Using this filter
 			 * you can overrule that behaviour.
@@ -325,86 +329,86 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 			 * @param bool $load Whether or not TGMPA should load.
 			 *                   Defaults to the return of `is_admin() && ! defined( 'DOING_AJAX' )`.
 			 */
-			if ( true !== apply_filters( 'tgmpa_load', ( is_admin() && ! defined( 'DOING_AJAX' ) ) ) ) {
+			if ( true !== apply_filters( 'j7rp_load', ( is_admin() && ! defined( 'DOING_AJAX' ) ) ) ) {
 				return;
 			}
 
 			// Load class strings.
 			$this->strings = array(
-				'page_title'                      => __( 'Install Required Plugins', 'tgmpa' ),
-				'menu_title'                      => __( 'Install Plugins', 'tgmpa' ),
+				'page_title'                      => __( 'Install Required Plugins', 'j7rp' ),
+				'menu_title'                      => __( 'Install Plugins', 'j7rp' ),
 				/* translators: %s: plugin name. */
-				'installing'                      => __( 'Installing Plugin: %s', 'tgmpa' ),
+				'installing'                      => __( 'Installing Plugin: %s', 'j7rp' ),
 				/* translators: %s: plugin name. */
-				'updating'                        => __( 'Updating Plugin: %s', 'tgmpa' ),
-				'oops'                            => __( 'Something went wrong with the plugin API.', 'tgmpa' ),
+				'updating'                        => __( 'Updating Plugin: %s', 'j7rp' ),
+				'oops'                            => __( 'Something went wrong with the plugin API.', 'j7rp' ),
 				'notice_can_install_required'     => _n_noop(
 					/* translators: 1: plugin name(s). */
 					'This theme requires the following plugin: %1$s.',
 					'This theme requires the following plugins: %1$s.',
-					'tgmpa'
+					'j7rp'
 				),
 				'notice_can_install_recommended'  => _n_noop(
 					/* translators: 1: plugin name(s). */
 					'This theme recommends the following plugin: %1$s.',
 					'This theme recommends the following plugins: %1$s.',
-					'tgmpa'
+					'j7rp'
 				),
 				'notice_ask_to_update'            => _n_noop(
 					/* translators: 1: plugin name(s). */
 					'The following plugin needs to be updated to its latest version to ensure maximum compatibility with this theme: %1$s.',
 					'The following plugins need to be updated to their latest version to ensure maximum compatibility with this theme: %1$s.',
-					'tgmpa'
+					'j7rp'
 				),
 				'notice_ask_to_update_maybe'      => _n_noop(
 					/* translators: 1: plugin name(s). */
 					'There is an update available for: %1$s.',
 					'There are updates available for the following plugins: %1$s.',
-					'tgmpa'
+					'j7rp'
 				),
 				'notice_can_activate_required'    => _n_noop(
 					/* translators: 1: plugin name(s). */
 					'The following required plugin is currently inactive: %1$s.',
 					'The following required plugins are currently inactive: %1$s.',
-					'tgmpa'
+					'j7rp'
 				),
 				'notice_can_activate_recommended' => _n_noop(
 					/* translators: 1: plugin name(s). */
 					'The following recommended plugin is currently inactive: %1$s.',
 					'The following recommended plugins are currently inactive: %1$s.',
-					'tgmpa'
+					'j7rp'
 				),
 				'install_link'                    => _n_noop(
 					'Begin installing plugin',
 					'Begin installing plugins',
-					'tgmpa'
+					'j7rp'
 				),
 				'update_link'                     => _n_noop(
 					'Begin updating plugin',
 					'Begin updating plugins',
-					'tgmpa'
+					'j7rp'
 				),
 				'activate_link'                   => _n_noop(
 					'Begin activating plugin',
 					'Begin activating plugins',
-					'tgmpa'
+					'j7rp'
 				),
-				'return'                          => __( 'Return to Required Plugins Installer', 'tgmpa' ),
-				'dashboard'                       => __( 'Return to the Dashboard', 'tgmpa' ),
-				'plugin_activated'                => __( 'Plugin activated successfully.', 'tgmpa' ),
-				'activated_successfully'          => __( 'The following plugin was activated successfully:', 'tgmpa' ),
+				'return'                          => __( 'Return to Required Plugins Installer', 'j7rp' ),
+				'dashboard'                       => __( 'Return to the Dashboard', 'j7rp' ),
+				'plugin_activated'                => __( 'Plugin activated successfully.', 'j7rp' ),
+				'activated_successfully'          => __( 'The following plugin was activated successfully:', 'j7rp' ),
 				/* translators: 1: plugin name. */
-				'plugin_already_active'           => __( 'No action taken. Plugin %1$s was already active.', 'tgmpa' ),
+				'plugin_already_active'           => __( 'No action taken. Plugin %1$s was already active.', 'j7rp' ),
 				/* translators: 1: plugin name. */
-				'plugin_needs_higher_version'     => __( 'Plugin not activated. A higher version of %s is needed for this theme. Please update the plugin.', 'tgmpa' ),
+				'plugin_needs_higher_version'     => __( 'Plugin not activated. A higher version of %s is needed for this theme. Please update the plugin.', 'j7rp' ),
 				/* translators: 1: dashboard link. */
-				'complete'                        => __( 'All plugins installed and activated successfully. %1$s', 'tgmpa' ),
-				'dismiss'                         => __( 'Dismiss this notice', 'tgmpa' ),
-				'notice_cannot_install_activate'  => __( 'There are one or more required or recommended plugins to install, update or activate.', 'tgmpa' ),
-				'contact_admin'                   => __( 'Please contact the administrator of this site for help.', 'tgmpa' ),
+				'complete'                        => __( 'All plugins installed and activated successfully. %1$s', 'j7rp' ),
+				'dismiss'                         => __( 'Dismiss this notice', 'j7rp' ),
+				'notice_cannot_install_activate'  => __( 'There are one or more required or recommended plugins to install, update or activate.', 'j7rp' ),
+				'contact_admin'                   => __( 'Please contact the administrator of this site for help.', 'j7rp' ),
 			);
 
-			do_action( 'tgmpa_register' );
+			do_action( 'j7rp_register' );
 
 			/* After this point, the plugins should be registered and the configuration set. */
 
@@ -414,7 +418,7 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 			}
 
 			// Set up the menu and notices if we still have outstanding actions.
-			if ( true !== $this->is_tgmpa_complete() ) {
+			if ( true !== $this->is_j7rp_complete() ) {
 				// Sort the plugins.
 				array_multisort( $this->sort_order, SORT_ASC, $this->plugins );
 
@@ -466,17 +470,17 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 		 * generator on the website.}}
 		 */
 		public function load_textdomain() {
-			if ( is_textdomain_loaded( 'tgmpa' ) ) {
+			if ( is_textdomain_loaded( 'j7rp' ) ) {
 				return;
 			}
 
 			if ( false !== strpos( __FILE__, WP_PLUGIN_DIR ) || false !== strpos( __FILE__, WPMU_PLUGIN_DIR ) ) {
 				// Plugin, we'll need to adjust the file name.
 				add_action( 'load_textdomain_mofile', array( $this, 'correct_plugin_mofile' ), 10, 2 );
-				load_theme_textdomain( 'tgmpa', __DIR__ . '/languages' );
+				load_theme_textdomain( 'j7rp', __DIR__ . '/languages' );
 				remove_action( 'load_textdomain_mofile', array( $this, 'correct_plugin_mofile' ), 10 );
 			} else {
-				load_theme_textdomain( 'tgmpa', __DIR__ . '/languages' );
+				load_theme_textdomain( 'j7rp', __DIR__ . '/languages' );
 			}
 		}
 
@@ -496,7 +500,7 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 		 */
 		public function correct_plugin_mofile( $mofile, $domain ) {
 			// Exit early if not our domain (just in case).
-			if ( 'tgmpa' !== $domain ) {
+			if ( 'j7rp' !== $domain ) {
 				return $mofile;
 			}
 			return preg_replace( '`/([a-z]{2}_[A-Z]{2}.mo)$`', '/tgmpa-$1', $mofile );
@@ -523,7 +527,7 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 		 */
 		public function overload_textdomain_mofile( $mofile, $domain ) {
 			// Exit early if not our domain, not a WP_LANG_DIR load or if the file exists and is readable.
-			if ( 'tgmpa' !== $domain || false === strpos( $mofile, WP_LANG_DIR ) || @is_readable( $mofile ) ) {
+			if ( 'j7rp' !== $domain || false === strpos( $mofile, WP_LANG_DIR ) || @is_readable( $mofile ) ) {
 				return $mofile;
 			}
 
@@ -604,8 +608,8 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 			$actions['update'] = sprintf(
 				'<a href="%1$s" title="%2$s" class="edit">%3$s</a>',
 				esc_url( $this->get_tgmpa_status_url( 'update' ) ),
-				esc_attr__( 'This plugin needs to be updated to be compatible with your theme.', 'tgmpa' ),
-				esc_html__( 'Update Required', 'tgmpa' )
+				esc_attr__( 'This plugin needs to be updated to be compatible with your theme.', 'j7rp' ),
+				esc_html__( 'Update Required', 'j7rp' )
 			);
 
 			return $actions;
@@ -684,8 +688,8 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @see TGM_Plugin_Activation::init()
-		 * @see TGM_Plugin_Activation::install_plugins_page()
+		 * @see J7_Required_Plugins::init()
+		 * @see J7_Required_Plugins::install_plugins_page()
 		 *
 		 * @return null Return early if user lacks capability to install a plugin.
 		 */
@@ -722,7 +726,7 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 		 */
 		protected function add_admin_menu( array $args ) {
 			if ( has_filter( 'tgmpa_admin_menu_use_add_theme_page' ) ) {
-				_deprecated_function( 'The "tgmpa_admin_menu_use_add_theme_page" filter', '2.5.0', esc_html__( 'Set the parent_slug config variable instead.', 'tgmpa' ) );
+				_deprecated_function( 'The "tgmpa_admin_menu_use_add_theme_page" filter', '2.5.0', esc_html__( 'Set the parent_slug config variable instead.', 'j7rp' ) );
 			}
 
 			if ( 'themes.php' === $this->parent_slug ) {
@@ -745,7 +749,8 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 		 */
 		public function install_plugins_page() {
 			// Store new instance of plugin table in object.
-			$plugin_table = new TGMPA_List_Table();
+			$id           = $this->id;
+			$plugin_table = new TGMPA_List_Table( $id );
 
 			// Return early if processing a plugin installation action.
 			if ( ( ( 'tgmpa-bulk-install' === $plugin_table->current_action() || 'tgmpa-bulk-update' === $plugin_table->current_action() ) && $plugin_table->process_bulk_actions() ) || $this->do_plugin_install() ) {
@@ -913,11 +918,9 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 					}
 				}
 
-				$this->show_tgmpa_version();
-
 				// Display message based on if all plugins are now active or not.
-				if ( $this->is_tgmpa_complete() ) {
-					echo '<p>', sprintf( esc_html( $this->strings['complete'] ), '<a href="' . esc_url( self_admin_url() ) . '">' . esc_html__( 'Return to the Dashboard', 'tgmpa' ) . '</a>' ), '</p>';
+				if ( $this->is_j7rp_complete() ) {
+					echo '<p>', sprintf( esc_html( $this->strings['complete'] ), '<a href="' . esc_url( self_admin_url() ) . '">' . esc_html__( 'Return to the Dashboard', 'j7rp' ) . '</a>' ), '</p>';
 					echo '<style type="text/css">#adminmenu .wp-submenu li.current { display: none !important; }</style>';
 				} else {
 					echo '<p><a href="', esc_url( $this->get_tgmpa_url() ), '" target="_parent">', esc_html( $this->strings['return'] ), '</a></p>';
@@ -1026,7 +1029,7 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 					} else {
 						return new WP_Error(
 							'rename_failed',
-							esc_html__( 'The remote plugin package does not contain a folder with the desired slug and renaming did not work.', 'tgmpa' ) . ' ' . esc_html__( 'Please contact the plugin provider and ask them to package their plugin according to the WordPress guidelines.', 'tgmpa' ),
+							esc_html__( 'The remote plugin package does not contain a folder with the desired slug and renaming did not work.', 'j7rp' ) . ' ' . esc_html__( 'Please contact the plugin provider and ask them to package their plugin according to the WordPress guidelines.', 'j7rp' ),
 							array(
 								'found'    => $subdir_name,
 								'expected' => $desired_slug,
@@ -1036,7 +1039,7 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 				} elseif ( empty( $subdir_name ) ) {
 					return new WP_Error(
 						'packaged_wrong',
-						esc_html__( 'The remote plugin package consists of more than one file, but the files are not packaged in a folder.', 'tgmpa' ) . ' ' . esc_html__( 'Please contact the plugin provider and ask them to package their plugin according to the WordPress guidelines.', 'tgmpa' ),
+						esc_html__( 'The remote plugin package consists of more than one file, but the files are not packaged in a folder.', 'j7rp' ) . ' ' . esc_html__( 'Please contact the plugin provider and ask them to package their plugin according to the WordPress guidelines.', 'j7rp' ),
 						array(
 							'found'    => $subdir_name,
 							'expected' => $desired_slug,
@@ -1223,12 +1226,12 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 						$count          = count( $plugin_group );
 						$linked_plugins = array_map( array( 'TGMPA_Utils', 'wrap_in_em' ), $linked_plugins );
 						$last_plugin    = array_pop( $linked_plugins ); // Pop off last name to prep for readability.
-						$imploded       = empty( $linked_plugins ) ? $last_plugin : ( implode( ', ', $linked_plugins ) . ' ' . esc_html_x( 'and', 'plugin A *and* plugin B', 'tgmpa' ) . ' ' . $last_plugin );
+						$imploded       = empty( $linked_plugins ) ? $last_plugin : ( implode( ', ', $linked_plugins ) . ' ' . esc_html_x( 'and', 'plugin A *and* plugin B', 'j7rp' ) . ' ' . $last_plugin );
 
 						$rendered .= sprintf(
 							$line_template,
 							sprintf(
-								translate_nooped_plural( $this->strings[ $type ], $count, 'tgmpa' ),
+								translate_nooped_plural( $this->strings[ $type ], $count, 'j7rp' ),
 								$imploded,
 								$count
 							)
@@ -1241,7 +1244,7 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 				}
 
 				// Register the nag messages and prepare them to be processed.
-				add_settings_error( 'tgmpa', 'tgmpa', $rendered, $this->get_admin_notice_class() );
+				add_settings_error( 'j7rp', 'j7rp', $rendered, $this->get_admin_notice_class() );
 			}
 
 			// Admin options pages already output settings_errors, so this is to avoid duplication.
@@ -1276,14 +1279,14 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 				if ( $install_count > 0 ) {
 					$action_links['install'] = sprintf(
 						$link_template,
-						translate_nooped_plural( $this->strings['install_link'], $install_count, 'tgmpa' ),
+						translate_nooped_plural( $this->strings['install_link'], $install_count, 'j7rp' ),
 						esc_url( $this->get_tgmpa_status_url( 'install' ) )
 					);
 				}
 				if ( $update_count > 0 ) {
 					$action_links['update'] = sprintf(
 						$link_template,
-						translate_nooped_plural( $this->strings['update_link'], $update_count, 'tgmpa' ),
+						translate_nooped_plural( $this->strings['update_link'], $update_count, 'j7rp' ),
 						esc_url( $this->get_tgmpa_status_url( 'update' ) )
 					);
 				}
@@ -1292,7 +1295,7 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 			if ( current_user_can( 'activate_plugins' ) && $activate_count > 0 ) {
 				$action_links['activate'] = sprintf(
 					$link_template,
-					translate_nooped_plural( $this->strings['activate_link'], $activate_count, 'tgmpa' ),
+					translate_nooped_plural( $this->strings['activate_link'], $activate_count, 'j7rp' ),
 					esc_url( $this->get_tgmpa_status_url( 'activate' ) )
 				);
 			}
@@ -1339,10 +1342,10 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 		protected function display_settings_errors() {
 			global $wp_settings_errors;
 
-			settings_errors( 'tgmpa' );
+			settings_errors( 'j7rp' );
 
 			foreach ( (array) $wp_settings_errors as $key => $details ) {
-				if ( 'tgmpa' === $details['setting'] ) {
+				if ( 'j7rp' === $details['setting'] ) {
 					unset( $wp_settings_errors[ $key ] );
 					break;
 				}
@@ -1814,7 +1817,7 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 		 *
 		 * @return bool True if complete, i.e. no outstanding actions. False otherwise.
 		 */
-		public function is_tgmpa_complete() {
+		public function is_j7rp_complete() {
 			$complete = true;
 			foreach ( $this->plugins as $slug => $plugin ) {
 				if ( ! $this->is_plugin_active( $slug ) || $this->does_plugin_require_update( $slug ) ) {
@@ -2078,52 +2081,50 @@ if ( ! class_exists( 'TGM_Plugin_Activation' ) ) {
 		}
 
 		/**
-		 * Echo the current TGMPA version number to the page.
-		 *
-		 * @since 2.5.0
-		 */
-		public function show_tgmpa_version() {
-			echo '<p style="float: right; padding: 0em 1.5em 0.5em 0;"><strong><small>',
-				esc_html(
-					sprintf(
-						/* translators: %s: version number */
-						__( 'TGMPA v%s', 'tgmpa' ),
-						self::TGMPA_VERSION
-					)
-				),
-				'</small></strong></p>';
-		}
-
-		/**
-		 * Returns the singleton instance of the class.
+		 * Returns the instance by id.
 		 *
 		 * @since 2.4.0
+		 * @param string $id The unique ID of the instance.
 		 *
-		 * @return \TGM_Plugin_Activation The TGM_Plugin_Activation object.
+		 * @return \J7_Required_Plugins The J7_Required_Plugins object.
 		 */
-		public static function get_instance() {
-			if ( ! isset( self::$instance ) && ! ( self::$instance instanceof self ) ) {
-				self::$instance = new self();
+		public static function get_instance( $id = '' ) {
+			if ( '' === $id ) {
+				return self::$instance;
 			}
 
-			return self::$instance;
-		}
-	}
+			if ( ! isset( self::$instance[ $id ] ) && ! ( self::$instance[ $id ] ?? null instanceof self ) ) {
+				self::$instance[ $id ] = new self();
+			}
 
-	if ( ! function_exists( 'load_tgm_plugin_activation' ) ) {
+			return self::$instance[ $id ];
+		}
+
 		/**
-		 * Ensure only one instance of the class is ever invoked.
-		 *
-		 * @since 2.5.0
+		 * Load bulk installer
 		 */
-		function load_tgm_plugin_activation() {
-			$GLOBALS['tgmpa'] = TGM_Plugin_Activation::get_instance();
+		public function tgmpa_load_bulk_installer() {
+			// Silently fail if 2.5+ is loaded *after* an older version.
+			if ( empty( $GLOBALS['j7rp'] ) ) {
+				return;
+			}
+
+			$id = $this->id;
+
+			// Get TGMPA class instance.
+			$tgmpa_instance = self::get_instance( $id );
+
+			if ( isset( $_GET['page'] ) && $tgmpa_instance->menu === $_GET['page'] ) {
+				if ( ! class_exists( 'Plugin_Upgrader', false ) ) {
+					require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+				}
+
+				require_once __DIR__ . '/class-bulk-installer.php';
+
+				require_once __DIR__ . '/class-bulk-installer-skin.php';
+
+			}
 		}
 	}
 
-	if ( did_action( 'plugins_loaded' ) ) {
-		load_tgm_plugin_activation();
-	} else {
-		add_action( 'plugins_loaded', 'load_tgm_plugin_activation' );
-	}
 }

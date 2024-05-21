@@ -248,91 +248,6 @@ if ( ! class_exists( 'J7_Required_Plugins' ) ) {
 			// Set the current WordPress version.
 			$this->wp_version = $GLOBALS['wp_version'];
 
-			// Announce that the class is ready, and pass the object (for advanced use).
-			do_action_ref_array( 'tgmpa_init', array( $this ) );
-
-			/*
-			 * Load our text domain and allow for overloading the fall-back file.
-			 *
-			 * {@internal IMPORTANT! If this code changes, review the regex in the custom TGMPA
-			 * generator on the website.}}
-			 */
-			add_action( 'init', array( $this, 'load_textdomain' ), 5 );
-			add_filter( 'load_textdomain_mofile', array( $this, 'overload_textdomain_mofile' ), 10, 2 );
-
-			// When the rest of WP has loaded, kick-start the rest of the class.
-			add_action( 'plugins_loaded', array( $this, 'init' ), -10 );
-		}
-
-		/**
-		 * Magic method to (not) set protected properties from outside of this class.
-		 *
-		 * {@internal hackedihack... There is a serious bug in v2.3.2 - 2.3.6  where the `menu` property
-		 * is being assigned rather than tested in a conditional, effectively rendering it useless.
-		 * This 'hack' prevents this from happening.}}
-		 *
-		 * @see https://github.com/TGMPA/TGM-Plugin-Activation/blob/2.3.6/tgm-plugin-activation/class-tgm-plugin-activation.php#L1593
-		 *
-		 * @since 2.5.2
-		 *
-		 * @param string $name  Name of an inaccessible property.
-		 * @param mixed  $value Value to assign to the property.
-		 * @return void  Silently fail to set the property when this is tried from outside of this class context.
-		 *               (Inside this class context, the __set() method if not used as there is direct access.)
-		 */
-		public function __set( $name, $value ) {
-			return;
-		}
-
-		/**
-		 * Magic method to get the value of a protected property outside of this class context.
-		 *
-		 * @since 2.5.2
-		 *
-		 * @param string $name Name of an inaccessible property.
-		 * @return mixed The property value.
-		 */
-		public function __get( $name ) {
-			return $this->{$name};
-		}
-
-		/**
-		 * Initialise the interactions between this class and WordPress.
-		 *
-		 * Hooks in three new methods for the class: admin_menu, notices and styles.
-		 *
-		 * @since 2.0.0
-		 *
-		 * @see J7_Required_Plugins::admin_menu()
-		 * @see J7_Required_Plugins::notices()
-		 * @see J7_Required_Plugins::styles()
-		 */
-		public function init() {
-			/**
- * The WP_Upgrader file isn't always available. If it isn't available,
- * we load it here.
- *
- * We check to make sure no action or activation keys are set so that WordPress
- * does not try to re-include the class when processing upgrades or installs outside
- * of the class.
- *
- * @since 2.2.0
- */
-			add_action( 'admin_init', array( $this, 'tgmpa_load_bulk_installer' ) );
-
-			/**
-			 * By default TGMPA only loads on the WP back-end and not in an Ajax call. Using this filter
-			 * you can overrule that behaviour.
-			 *
-			 * @since 2.5.0
-			 *
-			 * @param bool $load Whether or not TGMPA should load.
-			 *                   Defaults to the return of `is_admin() && ! defined( 'DOING_AJAX' )`.
-			 */
-			if ( true !== apply_filters( 'j7rp_load', ( is_admin() && ! defined( 'DOING_AJAX' ) ) ) ) {
-				return;
-			}
-
 			// Load class strings.
 			$this->strings = array(
 				'page_title'                      => __( 'Install Required Plugins', 'j7rp' ),
@@ -407,6 +322,91 @@ if ( ! class_exists( 'J7_Required_Plugins' ) ) {
 				'notice_cannot_install_activate'  => __( 'There are one or more required or recommended plugins to install, update or activate.', 'j7rp' ),
 				'contact_admin'                   => __( 'Please contact the administrator of this site for help.', 'j7rp' ),
 			);
+
+			// Announce that the class is ready, and pass the object (for advanced use).
+			do_action_ref_array( 'tgmpa_init', array( $this ) );
+
+			/*
+			 * Load our text domain and allow for overloading the fall-back file.
+			 *
+			 * {@internal IMPORTANT! If this code changes, review the regex in the custom TGMPA
+			 * generator on the website.}}
+			 */
+			add_action( 'init', array( $this, 'load_textdomain' ), 5 );
+			add_filter( 'load_textdomain_mofile', array( $this, 'overload_textdomain_mofile' ), 10, 2 );
+
+			// When the rest of WP has loaded, kick-start the rest of the class.
+			add_action( 'init', array( $this, 'init' ) );
+		}
+
+		/**
+		 * Magic method to (not) set protected properties from outside of this class.
+		 *
+		 * {@internal hackedihack... There is a serious bug in v2.3.2 - 2.3.6  where the `menu` property
+		 * is being assigned rather than tested in a conditional, effectively rendering it useless.
+		 * This 'hack' prevents this from happening.}}
+		 *
+		 * @see https://github.com/TGMPA/TGM-Plugin-Activation/blob/2.3.6/tgm-plugin-activation/class-tgm-plugin-activation.php#L1593
+		 *
+		 * @since 2.5.2
+		 *
+		 * @param string $name  Name of an inaccessible property.
+		 * @param mixed  $value Value to assign to the property.
+		 * @return void  Silently fail to set the property when this is tried from outside of this class context.
+		 *               (Inside this class context, the __set() method if not used as there is direct access.)
+		 */
+		public function __set( $name, $value ) {
+			return;
+		}
+
+		/**
+		 * Magic method to get the value of a protected property outside of this class context.
+		 *
+		 * @since 2.5.2
+		 *
+		 * @param string $name Name of an inaccessible property.
+		 * @return mixed The property value.
+		 */
+		public function __get( $name ) {
+			return $this->{$name};
+		}
+
+		/**
+		 * Initialise the interactions between this class and WordPress.
+		 *
+		 * Hooks in three new methods for the class: admin_menu, notices and styles.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @see J7_Required_Plugins::admin_menu()
+		 * @see J7_Required_Plugins::notices()
+		 * @see J7_Required_Plugins::styles()
+		 */
+		public function init() {
+			/**
+ * The WP_Upgrader file isn't always available. If it isn't available,
+ * we load it here.
+ *
+ * We check to make sure no action or activation keys are set so that WordPress
+ * does not try to re-include the class when processing upgrades or installs outside
+ * of the class.
+ *
+ * @since 2.2.0
+ */
+			add_action( 'admin_init', array( $this, 'tgmpa_load_bulk_installer' ) );
+
+			/**
+			 * By default TGMPA only loads on the WP back-end and not in an Ajax call. Using this filter
+			 * you can overrule that behaviour.
+			 *
+			 * @since 2.5.0
+			 *
+			 * @param bool $load Whether or not TGMPA should load.
+			 *                   Defaults to the return of `is_admin() && ! defined( 'DOING_AJAX' )`.
+			 */
+			if ( true !== apply_filters( 'j7rp_load', ( is_admin() && ! defined( 'DOING_AJAX' ) ) ) ) {
+				return;
+			}
 
 			do_action( 'j7rp_register' );
 

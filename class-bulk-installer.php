@@ -1,6 +1,6 @@
 <?php
 
-if ( ! class_exists( 'TGMPA_Bulk_Installer' ) ) {
+if ( ! class_exists( 'J7RP_Bulk_Installer' ) ) {
 
 	/**
 	 * Installer class to handle bulk plugin installations.
@@ -11,14 +11,14 @@ if ( ! class_exists( 'TGMPA_Bulk_Installer' ) ) {
 	 * @since 2.2.0
 	 *
 	 * {@internal Since 2.5.0 the class is an extension of Plugin_Upgrader rather than WP_Upgrader.}}
-	 * {@internal Since 2.5.2 the class has been renamed from TGM_Bulk_Installer to TGMPA_Bulk_Installer.
+	 * {@internal Since 2.5.2 the class has been renamed from TGM_Bulk_Installer to J7RP_Bulk_Installer.
 	 *            This was done to prevent backward compatibility issues with v2.3.6.}}
 	 *
 	 * @package TGM-Plugin-Activation
 	 * @author  Thomas Griffin
 	 * @author  Gary Jones
 	 */
-	class TGMPA_Bulk_Installer extends Plugin_Upgrader {
+	class J7RP_Bulk_Installer extends Plugin_Upgrader {
 		/**
 		 * Holds result of bulk plugin installation.
 		 *

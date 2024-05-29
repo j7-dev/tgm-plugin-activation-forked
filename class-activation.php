@@ -750,7 +750,7 @@ if ( ! class_exists( 'J7_Required_Plugins' ) ) {
 		public function install_plugins_page() {
 			// Store new instance of plugin table in object.
 			$id           = $this->id;
-			$plugin_table = new TGMPA_List_Table( $id );
+			$plugin_table = new J7RP_List_Table( $id );
 
 			// Return early if processing a plugin installation action.
 			if ( ( ( 'tgmpa-bulk-install' === $plugin_table->current_action() || 'tgmpa-bulk-update' === $plugin_table->current_action() ) && $plugin_table->process_bulk_actions() ) || $this->do_plugin_install() ) {
@@ -1224,7 +1224,7 @@ if ( ! class_exists( 'J7_Required_Plugins' ) ) {
 						unset( $plugin_slug );
 
 						$count          = count( $plugin_group );
-						$linked_plugins = array_map( array( 'TGMPA_Utils', 'wrap_in_em' ), $linked_plugins );
+						$linked_plugins = array_map( array( 'J7RP_Utils', 'wrap_in_em' ), $linked_plugins );
 						$last_plugin    = array_pop( $linked_plugins ); // Pop off last name to prep for readability.
 						$imploded       = empty( $linked_plugins ) ? $last_plugin : ( implode( ', ', $linked_plugins ) . ' ' . esc_html_x( 'and', 'plugin A *and* plugin B', 'j7rp' ) . ' ' . $last_plugin );
 
@@ -1407,9 +1407,9 @@ if ( ! class_exists( 'J7_Required_Plugins' ) ) {
 			// Forgive users for using string versions of booleans or floats for version number.
 			$plugin['version']            = (string) $plugin['version'];
 			$plugin['source']             = empty( $plugin['source'] ) ? 'repo' : $plugin['source'];
-			$plugin['required']           = TGMPA_Utils::validate_bool( $plugin['required'] );
-			$plugin['force_activation']   = TGMPA_Utils::validate_bool( $plugin['force_activation'] );
-			$plugin['force_deactivation'] = TGMPA_Utils::validate_bool( $plugin['force_deactivation'] );
+			$plugin['required']           = J7RP_Utils::validate_bool( $plugin['required'] );
+			$plugin['force_activation']   = J7RP_Utils::validate_bool( $plugin['force_activation'] );
+			$plugin['force_deactivation'] = J7RP_Utils::validate_bool( $plugin['force_deactivation'] );
 
 			// Enrich the received data.
 			$plugin['file_path']   = $this->_get_plugin_basename_from_slug( $plugin['slug'] );

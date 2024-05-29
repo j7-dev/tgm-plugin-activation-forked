@@ -1,6 +1,6 @@
 <?php
 
-if ( ! class_exists( 'TGMPA_Bulk_Installer_Skin' ) ) {
+if ( ! class_exists( 'J7RP_Bulk_Installer_Skin' ) ) {
 
 	/**
 	 * Installer skin to set strings for the bulk plugin installations..
@@ -11,7 +11,7 @@ if ( ! class_exists( 'TGMPA_Bulk_Installer_Skin' ) ) {
 	 * @since 2.2.0
 	 *
 	 * {@internal Since 2.5.2 the class has been renamed from TGM_Bulk_Installer_Skin to
-	 *            TGMPA_Bulk_Installer_Skin.
+	 *            J7RP_Bulk_Installer_Skin.
 	 *            This was done to prevent backward compatibility issues with v2.3.6.}}
 	 *
 	 * @see https://core.trac.wordpress.org/browser/trunk/src/wp-admin/includes/class-wp-upgrader-skins.php
@@ -20,7 +20,7 @@ if ( ! class_exists( 'TGMPA_Bulk_Installer_Skin' ) ) {
 	 * @author  Thomas Griffin
 	 * @author  Gary Jones
 	 */
-	class TGMPA_Bulk_Installer_Skin extends Bulk_Upgrader_Skin {
+	class J7RP_Bulk_Installer_Skin extends Bulk_Upgrader_Skin {
 		/**
 		 * Holds plugin info for each individual plugin installation.
 		 *
@@ -192,39 +192,12 @@ if ( ! class_exists( 'TGMPA_Bulk_Installer_Skin' ) ) {
 			 * @param array $update_actions Array of plugin action links.
 			 * @param array $plugin_info    Array of information for the last-handled plugin.
 			 */
-			$update_actions = apply_filters( 'tgmpa_update_bulk_plugins_complete_actions', $update_actions, $this->plugin_info );
+			$update_actions = apply_filters( 'j7rp_update_bulk_plugins_complete_actions', $update_actions, $this->plugin_info );
 
 			if ( ! empty( $update_actions ) ) {
 				$this->feedback( implode( ' | ', (array) $update_actions ) );
 			}
 		}
 
-		/* *********** DEPRECATED METHODS *********** */
-
-		/**
-		 * Flush header output buffer.
-		 *
-		 * @since      2.2.0
-		 * @deprecated 2.5.0 use {@see Bulk_Upgrader_Skin::flush_output()} instead
-		 * @see        Bulk_Upgrader_Skin::flush_output()
-		 */
-		public function before_flush_output() {
-			_deprecated_function( __FUNCTION__, 'TGMPA 2.5.0', 'Bulk_Upgrader_Skin::flush_output()' );
-			$this->flush_output();
-		}
-
-		/**
-		 * Flush footer output buffer and iterate $this->i to make sure the
-		 * installation strings reference the correct plugin.
-		 *
-		 * @since      2.2.0
-		 * @deprecated 2.5.0 use {@see Bulk_Upgrader_Skin::flush_output()} instead
-		 * @see        Bulk_Upgrader_Skin::flush_output()
-		 */
-		public function after_flush_output() {
-			_deprecated_function( __FUNCTION__, 'TGMPA 2.5.0', 'Bulk_Upgrader_Skin::flush_output()' );
-			$this->flush_output();
-			++$this->i;
-		}
 	}
 }

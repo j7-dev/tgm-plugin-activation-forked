@@ -11,7 +11,7 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
-if ( ! class_exists( 'TGMPA_List_Table' ) ) {
+if ( ! class_exists( 'J7RP_List_Table' ) ) {
 
 	/**
 	 * List table class for handling plugins.
@@ -30,7 +30,7 @@ if ( ! class_exists( 'TGMPA_List_Table' ) ) {
 	 * @author  Thomas Griffin
 	 * @author  Gary Jones
 	 */
-	class TGMPA_List_Table extends \WP_List_Table {
+	class J7RP_List_Table extends \WP_List_Table {
 		/**
 		 * TGMPA instance.
 		 *
@@ -83,7 +83,7 @@ if ( ! class_exists( 'TGMPA_List_Table' ) ) {
 				$this->view_context = sanitize_key( $_REQUEST['plugin_status'] );
 			}
 
-			add_filter( 'tgmpa_table_data_items', array( $this, 'sort_table_items' ) );
+			add_filter( 'j7rp_table_data_items', array( $this, 'sort_table_items' ) );
 		}
 
 		/**
@@ -806,9 +806,9 @@ if ( ! class_exists( 'TGMPA_List_Table' ) ) {
 				}
 				unset( $slug, $name, $source );
 
-				// Create a new instance of TGMPA_Bulk_Installer.
-				$installer = new TGMPA_Bulk_Installer(
-					new TGMPA_Bulk_Installer_Skin(
+				// Create a new instance of J7RP_Bulk_Installer.
+				$installer = new J7RP_Bulk_Installer(
+					new J7RP_Bulk_Installer_Skin(
 						array(
 							'url'          => esc_url_raw( $this->instance->get_tgmpa_url() ),
 							'nonce'        => 'bulk-' . $this->_args['plural'],
@@ -887,7 +887,7 @@ if ( ! class_exists( 'TGMPA_List_Table' ) ) {
 					echo '<div id="message" class="error"><p>', wp_kses_post( $activate->get_error_message() ), '</p></div>';
 				} else {
 					$count        = count( $plugin_names ); // Count so we can use _n function.
-					$plugin_names = array_map( array( 'TGMPA_Utils', 'wrap_in_strong' ), $plugin_names );
+					$plugin_names = array_map( array( 'J7RP_Utils', 'wrap_in_strong' ), $plugin_names );
 					$last_plugin  = array_pop( $plugin_names ); // Pop off last name to prep for readability.
 					$imploded     = empty( $plugin_names ) ? $last_plugin : ( implode( ', ', $plugin_names ) . ' ' . esc_html_x( 'and', 'plugin A *and* plugin B', 'j7rp' ) . ' ' . $last_plugin );
 
@@ -933,26 +933,8 @@ if ( ! class_exists( 'TGMPA_List_Table' ) ) {
 			}
 
 			// Store all of our plugin data into $items array so WP_List_Table can use it.
-			$this->items = apply_filters( 'tgmpa_table_data_items', $this->_gather_plugin_data() );
+			$this->items = apply_filters( 'j7rp_table_data_items', $this->_gather_plugin_data() );
 		}
 
-		/* *********** DEPRECATED METHODS *********** */
-
-		/**
-		 * Retrieve plugin data, given the plugin name.
-		 *
-		 * @since      2.2.0
-		 * @deprecated 2.5.0 use {@see J7_Required_Plugins::_get_plugin_data_from_name()} instead.
-		 * @see        J7_Required_Plugins::_get_plugin_data_from_name()
-		 *
-		 * @param string $name Name of the plugin, as it was registered.
-		 * @param string $data Optional. Array key of plugin data to return. Default is slug.
-		 * @return string|boolean Plugin slug if found, false otherwise.
-		 */
-		protected function _get_plugin_data_from_name( $name, $data = 'slug' ) {
-			_deprecated_function( __FUNCTION__, 'TGMPA 2.5.0', 'J7_Required_Plugins::_get_plugin_data_from_name()' );
-
-			return $this->instance->_get_plugin_data_from_name( $name, $data );
-		}
 	}
 }

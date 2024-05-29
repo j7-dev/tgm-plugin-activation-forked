@@ -3,7 +3,6 @@
 require_once __DIR__ . '/class-utils.php';
 require_once __DIR__ . '/class-list-table.php';
 require_once __DIR__ . '/class-activation.php';
-require_once __DIR__ . '/class-noused.php';
 
 if ( ! function_exists( 'j7rp' ) ) {
 	/**

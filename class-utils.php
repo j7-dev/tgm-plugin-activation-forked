@@ -1,21 +1,21 @@
 <?php
 
 
-if ( ! class_exists( 'TGMPA_Utils' ) ) {
+if ( ! class_exists( 'J7RP_Utils' ) ) {
 
 	/**
 	 * Generic utilities for TGMPA.
 	 *
 	 * All methods are static, poor-dev name-spacing class wrapper.
 	 *
-	 * Class was called TGM_Utils in 2.5.0 but renamed TGMPA_Utils in 2.5.1 as this was conflicting with Soliloquy.
+	 * Class was called TGM_Utils in 2.5.0 but renamed J7RP_Utils in 2.5.1 as this was conflicting with Soliloquy.
 	 *
 	 * @since 2.5.0
 	 *
 	 * @package TGM-Plugin-Activation
 	 * @author  Juliette Reinders Folmer
 	 */
-	class TGMPA_Utils {
+	class J7RP_Utils {
 		/**
 		 * Whether the PHP filter extension is enabled.
 		 *
@@ -126,5 +126,5 @@ if ( ! class_exists( 'TGMPA_Utils' ) ) {
 
 			return false;
 		}
-	} // End of class TGMPA_Utils
+	} // End of class J7RP_Utils
 } // End of class_exists wrapper

@@ -168,7 +168,6 @@ if ( ! class_exists( 'J7RP_Bulk_Installer_Skin' ) ) {
 			// Flush plugins cache so we can make sure that the installed plugins list is always up to date.
 			wp_clean_plugins_cache();
 
-			$this->instance->show_tgmpa_version();
 
 			// Display message based on if all plugins are now active or not.
 			$update_actions = array();

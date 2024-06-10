@@ -631,18 +631,6 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 				</tr>';
 		}
 
-		/**
-		 * Extra controls to be displayed between bulk actions and pagination.
-		 *
-		 * @since 2.5.0
-		 *
-		 * @param string $which 'top' or 'bottom' table navigation.
-		 */
-		public function extra_tablenav( $which ) {
-			if ( 'bottom' === $which ) {
-				$this->instance->show_tgmpa_version();
-			}
-		}
 
 		/**
 		 * Defines the bulk actions for handling registered plugins.

@@ -1,7 +1,7 @@
 {
   "name": "j7-dev/tgm-plugin-activation-forked",
   "description": "This is a library forked from tgmpa/tgm-plugin-activation and add some custom config and features",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "type": "library",
   "homepage": "http://tgmpluginactivation.com",
   "keywords": [

@@ -1,12 +1,14 @@
 <?php
-
-
 /**
  * WP_List_Table isn't always available. If it isn't available,
  * we load it here.
  *
  * @since 2.2.0
  */
+if (!defined('ABSPATH')) {
+	return;
+}
+
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
@@ -30,7 +32,7 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 	 * @author  Thomas Griffin
 	 * @author  Gary Jones
 	 */
-	class J7RP_List_Table extends \WP_List_Table {
+	final class J7RP_List_Table extends \WP_List_Table {
 		/**
 		 * TGMPA instance.
 		 *
@@ -56,12 +58,12 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 		 *
 		 * @var array
 		 */
-		protected $view_totals = array(
+		protected $view_totals = [
 			'all'      => 0,
 			'install'  => 0,
 			'update'   => 0,
 			'activate' => 0,
-		);
+		];
 
 		/**
 		 * References parent constructor and sets defaults for class.
@@ -72,18 +74,18 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 			$this->instance = J7_Required_Plugins::get_instance( $id );
 
 			parent::__construct(
-				array(
+				[
 					'singular' => 'plugin',
 					'plural'   => 'plugins',
 					'ajax'     => false,
-				)
+				]
 			);
 
-			if ( isset( $_REQUEST['plugin_status'] ) && in_array( $_REQUEST['plugin_status'], array( 'install', 'update', 'activate' ), true ) ) {
+			if ( isset( $_REQUEST['plugin_status'] ) && in_array( $_REQUEST['plugin_status'], [ 'install', 'update', 'activate' ], true ) ) {
 				$this->view_context = sanitize_key( $_REQUEST['plugin_status'] );
 			}
 
-			add_filter( 'j7rp_table_data_items', array( $this, 'sort_table_items' ) );
+			add_filter( 'j7rp_table_data_items', [ $this, 'sort_table_items' ] );
 		}
 
 		/**
@@ -96,7 +98,7 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 		 * @return array CSS classnames.
 		 */
 		public function get_table_classes() {
-			return array( 'widefat', 'fixed' );
+			return [ 'widefat', 'fixed' ];
 		}
 
 		/**
@@ -118,7 +120,7 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 			$this->set_view_totals( $plugins );
 
 			// Prep variables for use and grab list of all installed plugins.
-			$table_data = array();
+			$table_data = [];
 			$i          = 0;
 
 			// Redirect to the 'all' view if no plugins were found for the selected view context.
@@ -142,7 +144,7 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 				if ( ! empty( $upgrade_notice ) ) {
 					$table_data[ $i ]['upgrade_notice'] = $upgrade_notice;
 
-					add_action( "tgmpa_after_plugin_row_{$slug}", array( $this, 'wp_plugin_update_row' ), 10, 2 );
+					add_action( "tgmpa_after_plugin_row_{$slug}", [ $this, 'wp_plugin_update_row' ], 10, 2 );
 				}
 
 				$table_data[ $i ] = apply_filters( 'tgmpa_table_data_item', $table_data[ $i ], $plugin );
@@ -159,12 +161,12 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 		 * @since 2.5.0
 		 */
 		protected function categorize_plugins_to_views() {
-			$plugins = array(
-				'all'      => array(), // Meaning: all plugins which still have open actions.
-				'install'  => array(),
-				'update'   => array(),
-				'activate' => array(),
-			);
+			$plugins = [
+				'all'      => [], // Meaning: all plugins which still have open actions.
+				'install'  => [],
+				'update'   => [],
+				'activate' => [],
+			];
 
 			foreach ( $this->instance->plugins as $slug => $plugin ) {
 				if ( $this->instance->is_plugin_active( $slug ) && false === $this->instance->does_plugin_have_update( $slug ) ) {
@@ -297,8 +299,8 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 		 * @return array Sorted table items.
 		 */
 		public function sort_table_items( $items ) {
-			$type = array();
-			$name = array();
+			$type = [];
+			$name = [];
 
 			foreach ( $items as $i => $plugin ) {
 				$type[ $i ] = $plugin['type']; // Required / recommended.
@@ -318,7 +320,7 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 		 * @return array
 		 */
 		public function get_views() {
-			$status_links = array();
+			$status_links = [];
 
 			foreach ( $this->view_totals as $type => $count ) {
 				if ( $count < 1 ) {
@@ -419,7 +421,7 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 		 * @return string HTML-formatted version information.
 		 */
 		public function column_version( $item ) {
-			$output = array();
+			$output = [];
 
 			if ( $this->instance->is_plugin_installed( $item['slug'] ) ) {
 				$installed = ! empty( $item['installed_version'] ) ? $item['installed_version'] : _x( 'unknown', 'as in: "version nr unknown"', 'j7rp' );
@@ -485,12 +487,12 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 		 * @return array $columns The column names.
 		 */
 		public function get_columns() {
-			$columns = array(
+			$columns = [
 				'cb'     => '<input type="checkbox" />',
 				'plugin' => __( 'Plugin', 'j7rp' ),
 				'source' => __( 'Source', 'j7rp' ),
 				'type'   => __( 'Type', 'j7rp' ),
-			);
+			];
 
 			if ( 'all' === $this->view_context || 'update' === $this->view_context ) {
 				$columns['version'] = __( 'Version', 'j7rp' );
@@ -537,8 +539,8 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 		 * @return array Array with relevant action links.
 		 */
 		protected function get_row_actions( $item ) {
-			$actions      = array();
-			$action_links = array();
+			$actions      = [];
+			$action_links = [];
 
 			// Display the 'Install' action link if the plugin is not yet available.
 			if ( ! $this->instance->is_plugin_installed( $item['slug'] ) ) {
@@ -562,10 +564,10 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 			foreach ( $actions as $action => $text ) {
 				$nonce_url = wp_nonce_url(
 					add_query_arg(
-						array(
+						[
 							'plugin'           => urlencode( $item['slug'] ),
 							'tgmpa-' . $action => $action . '-plugin',
-						),
+						],
 						$this->instance->get_tgmpa_url()
 					),
 					'tgmpa-' . $action,
@@ -624,8 +626,8 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 				<tr class="plugin-update-tr">
 					<td colspan="', absint( $this->get_column_count() ), '" class="plugin-update colspanchange">
 						<div class="update-message">',
-							esc_html__( 'Upgrade message from the plugin author:', 'j7rp' ),
-							' <strong>', wp_kses_data( $item['upgrade_notice'] ), '</strong>
+			esc_html__( 'Upgrade message from the plugin author:', 'j7rp' ),
+			' <strong>', wp_kses_data( $item['upgrade_notice'] ), '</strong>
 						</div>
 					</td>
 				</tr>';
@@ -641,7 +643,7 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 		 */
 		public function get_bulk_actions() {
 
-			$actions = array();
+			$actions = [];
 
 			if ( 'update' !== $this->view_context && 'activate' !== $this->view_context ) {
 				if ( current_user_can( 'install_plugins' ) ) {
@@ -680,7 +682,7 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 					$install_type = 'update';
 				}
 
-				$plugins_to_install = array();
+				$plugins_to_install = [];
 
 				// Did user actually select any plugins to install/update ?
 				if ( empty( $_POST['plugin'] ) ) {
@@ -704,7 +706,7 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 
 				// Sanitize the received input.
 				$plugins_to_install = array_map( 'urldecode', $plugins_to_install );
-				$plugins_to_install = array_map( array( $this->instance, 'sanitize_key' ), $plugins_to_install );
+				$plugins_to_install = array_map( [ $this->instance, 'sanitize_key' ], $plugins_to_install );
 
 				// Validate the received input.
 				foreach ( $plugins_to_install as $key => $slug ) {
@@ -765,10 +767,10 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 				/* If we arrive here, we have the filesystem */
 
 				// Store all information in arrays since we are processing a bulk installation.
-				$names      = array();
-				$sources    = array(); // Needed for installs.
-				$file_paths = array(); // Needed for upgrades.
-				$to_inject  = array(); // Information to inject into the update_plugins transient.
+				$names      = [];
+				$sources    = []; // Needed for installs.
+				$file_paths = []; // Needed for upgrades.
+				$to_inject  = []; // Information to inject into the update_plugins transient.
 
 				// Prepare the data for validated plugins for the install/upgrade.
 				foreach ( $plugins_to_install as $slug ) {
@@ -797,23 +799,23 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 				// Create a new instance of J7RP_Bulk_Installer.
 				$installer = new J7RP_Bulk_Installer(
 					new J7RP_Bulk_Installer_Skin(
-						array(
+						[
 							'url'          => esc_url_raw( $this->instance->get_tgmpa_url() ),
 							'nonce'        => 'bulk-' . $this->_args['plural'],
 							'names'        => $names,
 							'install_type' => $install_type,
 							'instance'     => $this->instance,
-						)
+						]
 					)
 				);
 
 				// Wrap the install process with the appropriate HTML.
 				echo '<div class="tgmpa">',
-					'<h2 style="font-size: 23px; font-weight: 400; line-height: 29px; margin: 0; padding: 9px 15px 4px 0;">', esc_html( get_admin_page_title() ), '</h2>
+				'<h2 style="font-size: 23px; font-weight: 400; line-height: 29px; margin: 0; padding: 9px 15px 4px 0;">', esc_html( get_admin_page_title() ), '</h2>
 					<div class="update-php" style="width: 100%; height: 98%; min-height: 850px; padding-top: 1px;">';
 
 				// Process the bulk installation submissions.
-				add_filter( 'upgrader_source_selection', array( $this->instance, 'maybe_adjust_source_dir' ), 1, 3 );
+				add_filter( 'upgrader_source_selection', [ $this->instance, 'maybe_adjust_source_dir' ], 1, 3 );
 
 				if ( 'tgmpa-bulk-update' === $this->current_action() ) {
 					// Inject our info into the update transient.
@@ -824,7 +826,7 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 					$installer->bulk_install( $sources );
 				}
 
-				remove_filter( 'upgrader_source_selection', array( $this->instance, 'maybe_adjust_source_dir' ), 1 );
+				remove_filter( 'upgrader_source_selection', [ $this->instance, 'maybe_adjust_source_dir' ], 1 );
 
 				echo '</div></div>';
 
@@ -843,14 +845,14 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 				}
 
 				// Grab plugin data from $_POST.
-				$plugins = array();
+				$plugins = [];
 				if ( isset( $_POST['plugin'] ) ) {
 					$plugins = array_map( 'urldecode', (array) $_POST['plugin'] );
-					$plugins = array_map( array( $this->instance, 'sanitize_key' ), $plugins );
+					$plugins = array_map( [ $this->instance, 'sanitize_key' ], $plugins );
 				}
 
-				$plugins_to_activate = array();
-				$plugin_names        = array();
+				$plugins_to_activate = [];
+				$plugin_names        = [];
 
 				// Grab the file paths for the selected & inactive plugins from the registration array.
 				foreach ( $plugins as $slug ) {
@@ -875,7 +877,7 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 					echo '<div id="message" class="error"><p>', wp_kses_post( $activate->get_error_message() ), '</p></div>';
 				} else {
 					$count        = count( $plugin_names ); // Count so we can use _n function.
-					$plugin_names = array_map( array( 'J7RP_Utils', 'wrap_in_strong' ), $plugin_names );
+					$plugin_names = array_map( [ 'J7RP_Utils', 'wrap_in_strong' ], $plugin_names );
 					$last_plugin  = array_pop( $plugin_names ); // Pop off last name to prep for readability.
 					$imploded     = empty( $plugin_names ) ? $last_plugin : ( implode( ', ', $plugin_names ) . ' ' . esc_html_x( 'and', 'plugin A *and* plugin B', 'j7rp' ) . ' ' . $last_plugin );
 
@@ -910,10 +912,10 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 		 */
 		public function prepare_items() {
 			$columns               = $this->get_columns(); // Get all necessary column information.
-			$hidden                = array(); // No columns to hide, but we must set as an array.
-			$sortable              = array(); // No reason to make sortable columns.
+			$hidden                = []; // No columns to hide, but we must set as an array.
+			$sortable              = []; // No reason to make sortable columns.
 			$primary               = $this->get_primary_column_name(); // Column which has the row actions.
-			$this->_column_headers = array( $columns, $hidden, $sortable, $primary ); // Get all necessary column headers.
+			$this->_column_headers = [ $columns, $hidden, $sortable, $primary ]; // Get all necessary column headers.
 
 			// Process our bulk activations here.
 			if ( 'tgmpa-bulk-activate' === $this->current_action() ) {
@@ -923,6 +925,5 @@ if ( ! class_exists( 'J7RP_List_Table' ) ) {
 			// Store all of our plugin data into $items array so WP_List_Table can use it.
 			$this->items = apply_filters( 'j7rp_table_data_items', $this->_gather_plugin_data() );
 		}
-
 	}
 }

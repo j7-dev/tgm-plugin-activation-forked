@@ -1570,7 +1570,7 @@ if ( ! class_exists( 'J7_Required_Plugins' ) ) {
 		 * @return string Either file path for plugin if installed, or just the plugin slug.
 		 */
 		protected function _get_plugin_basename_from_slug( $slug ) {
-			$keys = array_keys( $this->get_plugins() );
+			$keys = array_keys( $this->get_plugins() ?? [] );
 
 			foreach ( $keys as $key ) {
 				if ( preg_match( '|^' . $slug . '/|', $key ) ) {

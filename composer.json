@@ -31,5 +31,21 @@
 	},
 	"require": {
 		"php": ">=5.2"
+	},
+	"require-dev": {
+		"squizlabs/php_codesniffer": "@stable",
+		"wp-coding-standards/wpcs": "@stable",
+		"dealerdirect/phpcodesniffer-composer-installer": "@stable",
+		"phpcompatibility/php-compatibility": "@stable",
+		"phpstan/phpstan": "@stable",
+		"php-stubs/woocommerce-stubs": "@stable",
+		"php-stubs/wordpress-stubs": "@stable",
+		"phpstan/extension-installer": "@stable"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"phpstan/extension-installer": true
+		}
 	}
 }
